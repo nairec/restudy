@@ -1,5 +1,6 @@
 import React from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import Image from "next/image"
 
 type ConceptMapViewerProps = {
   imageData: string; // Prop para recibir la imagen codificada en base64
@@ -15,10 +16,11 @@ const MindMap: React.FC<ConceptMapViewerProps> = ({ imageData }) => {
           {(
             <div className="relative">
               <TransformComponent>
-                <img
+                <Image
                   src={'data:image/png;base64,'+ imageData}
                   alt="Mapa Conceptual"
-                  style={{ width: "100%", height: "auto", objectFit: "contain" }}
+                  width={500}
+                  height={500}
                 />
               </TransformComponent>
             </div>
