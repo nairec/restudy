@@ -19,8 +19,8 @@ from dotenv import load_dotenv
 from PIL import Image
 from pdf2image import convert_from_bytes
 import easyocr
-import fitz
 import numpy as np
+import fitz
 
 app = FastAPI()
 load_dotenv('.env')

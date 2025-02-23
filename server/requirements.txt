@@ -11,3 +11,4 @@ load-dotenv
 easyocr
 pillow 
 pdf2image
+pymupdf
