@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { FileText, Upload, ClipboardType } from 'lucide-react';
-import DocumentUpload from '../components/DocumentUpload';
-import Summary from '../components/Summary';
-import MindMap from '../components/MindMap';
-import Questions from '../components/Questions';
-import Resources from '../components/Resources';
-import LoadingOverlay from '../components/LoadingOverlay';
+import DocumentUpload from './components/DocumentUpload';
+import Summary from './components/Summary';
+import MindMap from './components/MindMap';
+import Questions from './components/Questions';
+import Resources from './components/Resources';
+import LoadingOverlay from './components/LoadingOverlay';
 
 
 export default function Home() {
