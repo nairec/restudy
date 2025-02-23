@@ -24,8 +24,9 @@ import numpy as np
 
 app = FastAPI()
 load_dotenv('.env')
+PORT = os.getenv('PORT')
 GROQ_TOKEN = os.getenv('GROQ_API_KEY')
-client = Groq(api_key="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")
+client = Groq(api_key=GROQ_TOKEN)
 
 class TextInput(BaseModel):
     text: str
@@ -275,4 +276,4 @@ async def process_content(content: str, summary_length: str, question_number: st
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=PORT)

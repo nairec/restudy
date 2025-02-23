@@ -7,7 +7,6 @@ groq
 spacy
 networkx
 matplotlib
-itertools
 load-dotenv
 easyocr
 pillow 
