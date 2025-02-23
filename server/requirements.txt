@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-multipart
+PyPDF2
+python-docx
+groq
+spacy
+networkx
+matplotlib
+itertools
+load-dotenv
+easyocr
+pillow 
+pdf2image
