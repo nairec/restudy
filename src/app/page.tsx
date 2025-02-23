@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from "next/image";
 import { FileText, Upload, ClipboardType } from 'lucide-react';
 import DocumentUpload from '../components/DocumentUpload';
 import Summary from '../components/Summary';

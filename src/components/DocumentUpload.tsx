@@ -9,7 +9,7 @@ interface DocumentUploadProps {
 }
 
 export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelectedAnalysis, inputType }: DocumentUploadProps) {
-  let [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [summaryLength, setSummaryLength] = useState(200);
   const [questionNumber, setQuestionNumber] = useState(3);
   const [difficulty, setDifficulty] = useState('moderate');
@@ -21,10 +21,6 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
     { value: 'questions', label: 'Questions' },
     { value: 'resources', label: 'Resources (Not implemented yet)' },
   ];
-
-  if (inputType === 'text') {
-    file = null;
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
