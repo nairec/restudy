@@ -14,7 +14,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [selectedAnalysis, setSelectedAnalysis] = useState<string[]>(['summary']);
-  const [inputType, setInputType] = useState<'file' | 'text'>('file');
+  const [inputType, setInputType] = useState<'file' | 'text' | 'youtube'>('file');
 
   const handleAnalyze = async (formData: FormData) => {
     try {
@@ -40,47 +40,49 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center">
-            <FileText className="h-8 w-8 text-indigo-600" />
-            <h1 className="ml-2 text-2xl font-bold text-indigo-600">
-              restudy
-            </h1>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600" />
+              <h1 className="ml-2 text-xl sm:text-2xl font-bold text-indigo-600">
+                restudy
+              </h1>
+            </div>
           </div>
         </div>
       </nav>
-      <main className="max-w-7xl mx-auto py-6 px-4">
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <div className="mb-6">
-            <div className="flex border-b border-gray-200">
+      <main className="max-w-7xl mx-auto py-4 sm:py-6 px-3 sm:px-4">
+        <div className="bg-white rounded-lg shadow p-3 sm:p-4 mb-4 sm:mb-6">
+          <div className="mb-4 sm:mb-6">
+            <div className="flex flex-wrap border-b border-gray-200">
               <button
-                className={`py-2 px-4 text-sm font-medium ${
+                className={`py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium flex-1 sm:flex-none ${
                   inputType === 'file'
                     ? 'text-indigo-600 border-b-2 border-indigo-600'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
                 onClick={() => setInputType('file')}
               >
-                <div className="flex items-center">
-                  <Upload className="h-4 w-4 mr-2" />
+                <div className="flex items-center justify-center">
+                  <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Upload File
                 </div>
               </button>
               <button
-                className={`py-2 px-4 text-sm font-medium ${
+                className={`py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium flex-1 sm:flex-none ${
                   inputType === 'text'
                     ? 'text-indigo-600 border-b-2 border-indigo-600'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
                 onClick={() => setInputType('text')}
               >
-                <div className="flex items-center">
-                  <ClipboardType className="h-4 w-4 mr-2" />
+                <div className="flex items-center justify-center">
+                  <ClipboardType className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Paste Text
                 </div>
               </button>
             </div>
-        </div>
+          </div>
           <DocumentUpload 
             onAnalyze={handleAnalyze} 
             selectedAnalysis={selectedAnalysis}
@@ -90,7 +92,7 @@ export default function Home() {
         </div>
         
         {results ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 mt-4 sm:mt-6">
             {selectedAnalysis.includes('summary') && (
               <Summary text={results['summary'] || ""} />
             )}
@@ -108,7 +110,7 @@ export default function Home() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 mt-4 sm:mt-6">
             <Summary text={""} />
             <MindMap imageData={""} />
             <Questions 
