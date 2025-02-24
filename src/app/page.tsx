@@ -8,7 +8,7 @@ import MindMap from './components/MindMap';
 import Questions from './components/Questions';
 import Resources from './components/Resources';
 import LoadingOverlay from './components/LoadingOverlay';
-
+import GridLayout from './components/GridLayout';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +20,7 @@ export default function Home() {
     try {
       setIsLoading(true);
       
-      const response = await fetch('https://restudy.onrender.com/analyze-content', {
+      const response = await fetch('https://restudy.onrender.com:8000/analyze-content', {
         method: 'POST',
         body: formData,
       });
@@ -92,33 +92,25 @@ export default function Home() {
         </div>
         
         {results ? (
-          <div className="grid grid-cols-1 gap-4 sm:gap-6 mt-4 sm:mt-6">
-            {selectedAnalysis.includes('summary') && (
-              <Summary text={results['summary'] || ""} />
-            )}
-            {selectedAnalysis.includes('mindmap') && (
-              <MindMap imageData={results['mindmap'] || ""} />
-            )}
-            {selectedAnalysis.includes('questions') && (
-              <Questions 
-                questions={results['questions'] || []} 
-                answers={results['answers'] || []} 
-              />
-            )}
-            {selectedAnalysis.includes('resources') && (
-              <Resources resources={results['resources'] || []} />
-            )}
-          </div>
+          <GridLayout>
+            <Summary text={results['summary'] || ""} />
+            <Questions 
+              questions={results['questions'] || []} 
+              answers={results['answers'] || []} 
+            />
+            <MindMap imageData={results['mindmap'] || ""} />
+            <Resources resources={results['resources'] || []} />
+          </GridLayout>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:gap-6 mt-4 sm:mt-6">
+          <GridLayout>
             <Summary text={""} />
-            <MindMap imageData={""} />
             <Questions 
               questions={[]} 
               answers={[]} 
             />
+            <MindMap imageData={""} />
             <Resources resources={[]} />
-          </div>
+          </GridLayout>
         )}
         
         <LoadingOverlay isVisible={isLoading} />
@@ -126,4 +118,3 @@ export default function Home() {
     </div>
   );
 }
-

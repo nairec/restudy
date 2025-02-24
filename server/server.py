@@ -254,6 +254,7 @@ async def process_content(content: str, summary_length: str, question_number: st
     summary = ""
     questions = {}
     mindmap = ""
+    resources = []
 
     if "summary" in analysis_type:
         summary = await get_summary(content, summary_length)
@@ -267,13 +268,9 @@ async def process_content(content: str, summary_length: str, question_number: st
         "mindmap": mindmap,
         "questions": questions.get('questions', []),
         "answers": questions.get('answers', []),
-        "resources": [
-            "Additional Resource 1",
-            "Additional Resource 2",
-            "Additional Resource 3"
-        ]
+        "resources": resources
     }
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=PORT)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
