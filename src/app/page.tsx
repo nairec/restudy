@@ -20,7 +20,7 @@ export default function Home() {
     try {
       setIsLoading(true);
       
-      const response = await fetch('https://restudy.onrender.com:8000/analyze-content', {
+      const response = await fetch('https://restudyserver.onrender.com/analyze-content', {
         method: 'POST',
         body: formData,
       });
@@ -38,28 +38,28 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-lg">
+    <div className="min-h-screen bg-[#191825]">
+      <nav className="bg-[#191825] shadow-lg border-b border-[#00FF9C]/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600" />
-              <h1 className="ml-2 text-xl sm:text-2xl font-bold text-indigo-600">
+              <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-[#00FF9C]" />
+              <h1 className="ml-2 text-xl sm:text-2xl font-bold text-[#00FF9C]">
                 restudy
               </h1>
             </div>
           </div>
         </div>
       </nav>
-      <main className="max-w-7xl mx-auto py-4 sm:py-6 px-3 sm:px-4">
-        <div className="bg-white rounded-lg shadow p-3 sm:p-4 mb-4 sm:mb-6">
+      <main className="bg-[#191825] max-w-7xl mx-auto py-4 sm:py-6 px-3 sm:px-4">
+        <div className="rounded-lg border border-[#00FF9C]/20 shadow-[0_0_20px_rgba(0,255,156,0.15)] p-3 sm:p-4 mb-4 sm:mb-6">
           <div className="mb-4 sm:mb-6">
-            <div className="flex flex-wrap border-b border-gray-200">
+            <div className="flex flex-wrap border-b border-[#00FF9C]/20">
               <button
                 className={`py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium flex-1 sm:flex-none ${
                   inputType === 'file'
-                    ? 'text-indigo-600 border-b-2 border-indigo-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'text-[#00FF9C] border-b-2 border-[#00FF9C]'
+                    : 'text-[#00FF9C]/60 hover:text-[#00FF9C] transition-colors duration-200'
                 }`}
                 onClick={() => setInputType('file')}
               >
@@ -71,8 +71,8 @@ export default function Home() {
               <button
                 className={`py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium flex-1 sm:flex-none ${
                   inputType === 'text'
-                    ? 'text-indigo-600 border-b-2 border-indigo-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'text-[#00FF9C] border-b-2 border-[#00FF9C]'
+                    : 'text-[#00FF9C]/60 hover:text-[#00FF9C] transition-colors duration-200'
                 }`}
                 onClick={() => setInputType('text')}
               >

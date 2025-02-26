@@ -72,15 +72,15 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
+    <div className="bg-[#191825] rounded-lg shadow-sm p-6">
       <div>
         {inputType === 'file' ? (
-          <h2 className="text-black font-semibold mb-4 flex items-center">
+          <h2 className="text-white font-semibold mb-4 flex items-center">
             <Upload className="h-5 w-5 mr-2" />
             Upload Your Document
           </h2>
         ):(
-          <h2 className="text-black font-semibold mb-4 flex items-center">
+          <h2 className="text-white font-semibold mb-4 flex items-center">
             <ClipboardType className="h-5 w-5 mr-2" />
             Paste your text
           </h2>
@@ -90,31 +90,31 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
       <form onSubmit={handleSubmit} className="space-y-4">
         {inputType === 'file' ? (
           <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium text-black">
+            <label className="text-sm font-medium text-white">
               Choose a document (PDF, DOCX, or TXT)
             </label>
             <input
               type="file"
               accept=".pdf,.docx,.txt"
               onChange={(e) => setFile(e.target.files?.[0] || null)}
-              className="p-2 border border-gray-300 rounded-md text-white"
+              className="bg-[#191825] border border-[#00FF9C]/20 text-[#191825] rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-[#00FF9C]/50 placeholder-[#00FF9C]/40"
             />
             {file && (
-              <p className="text-sm text-black">
+              <p className="text-sm text-white">
                 Selected: {file.name} ({(file.size / 1024 / 1024).toFixed(2)}MB)
               </p>
             )}
           </div>
         ):(
           <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium text-black">
+            <label className="text-sm font-medium text-white">
               Paste your text here
             </label>
             <textarea
               rows={5}
               value={text}
               onChange={(e) => setText(e.target.value as string)}
-              className="p-2 border border-gray-300 rounded-md text-black"
+              className="p-2 border border-gray-300 rounded-md text-white bg-[#191825]"
             />
           </div>
         )}
@@ -122,15 +122,15 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="w-full">
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-black block">
+              <label className="text-sm font-medium text-white block">
                 Summary Length (50-500 words)
               </label>
               <button 
                 type="button"
-                className="md:hidden"
+                className="md:hidden text-white"
                 onClick={() => showInfoMessage(`Aproximate length of the summary (if 'Summary' is selected)`)}
               >
-                <Info className="h-4 w-4 text-gray-500" />
+                <Info className="h-4 w-4 text-white-500" />
               </button>
             </div>
             <input
@@ -139,11 +139,11 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
               max="500"
               value={summaryLength}
               onChange={(e) => setSummaryLength(Number(e.target.value))}
-              className="w-full p-2 border border-gray-300 rounded-md text-black mt-1"
+              className="w-full p-2 border rounded-md mt-1 bg-[#191825] text-[#00FF9C] border-[#00FF9C]"
             />
             <div className="mt-1 hidden md:block">
               {(summaryLength >= 50 && summaryLength <= 500) && (
-                <p className="text-sm text-black">
+                <p className="text-sm text-white">
                   The summary will be approximately {summaryLength} words long.
                 </p>
               )}
@@ -157,15 +157,15 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
 
           <div className="w-full">
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-black block">
+              <label className="text-sm font-medium text-white block bg-[#191825]">
                 Number of Questions (1-10)
               </label>
               <button 
                 type="button"
-                className="md:hidden"
+                className="md:hidden text-white"
                 onClick={() => showInfoMessage(`Number of questions that will be generated (if 'Questions' is selected)`)}
               >
-                <Info className="h-4 w-4 text-gray-500" />
+                <Info className="h-4 w-4 text-white-500" />
               </button>
             </div>
             <input
@@ -174,11 +174,11 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
               max="10"
               value={questionNumber}
               onChange={(e) => setQuestionNumber(Number(e.target.value))}
-              className="w-full p-2 border border-gray-300 rounded-md text-black mt-1"
+              className="w-full p-2 border rounded-md mt-1 bg-[#191825] text-[#00FF9C] border-[#00FF9C]"
             />
             <div className="mt-1 hidden md:block">
               {(questionNumber >= 1 && questionNumber <= 10) && (
-                <p className="text-sm text-black">
+                <p className="text-sm text-white">
                   {questionNumber} questions will be generated
                 </p>
               )}
@@ -192,21 +192,21 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
 
           <div className="w-full">
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-black block">
+              <label className="text-sm font-medium text-white block">
                 Question Difficulty
               </label>
               <button 
                 type="button"
-                className="md:hidden"
+                className="md:hidden text-white"
                 onClick={() => showInfoMessage(`Difficulty level of the generated questions (if 'Questions' is selected) \n 'Further Research Required' means you will need to do further research to answer the questions`)}
               >
-                <Info className="h-4 w-4 text-gray-500" />
+                <Info className="h-4 w-4 text-white-500" />
               </button>
             </div>
             <select
               value={difficulty}
               onChange={(e) => setDifficulty(e.target.value as string)}
-              className="w-full p-2 border border-gray-300 rounded-md text-black mt-1 bg-white"
+              className="w-full p-2 border rounded-md bg-[#191825] border-[#00FF9C] text-[#00FF9C] hover:bg-[#00FF9C]/10"
             >
               <option value="easy">Easy</option>
               <option value="moderate">Moderate</option>
@@ -214,13 +214,13 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
               <option value="further research required">Further Research Required</option>
               <option value="varied">Varied</option>
             </select>
-            <p className="text-sm text-black mt-1 hidden md:block">
+            <p className="text-sm text-white mt-1 hidden md:block">
               Selected difficulty: {difficulty}
             </p>
           </div>
         </div>
         <div className="mb-4">
-          <p className="text-sm font-medium text-gray-700 mb-2">Select Analysis Types:</p>
+          <p className="text-sm font-medium text-white mb-2">Select Analysis Types:</p>
           <div className="space-y-2">
             {analysisOptions.map(({ value, label }) => (
               <label key={value} className="flex items-center space-x-2">
@@ -230,7 +230,7 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
                   onChange={() => handleAnalysisChange(value)}
                   className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                 />
-                <span className="text-sm text-gray-700">{label}</span>
+                <span className="text-sm text-white">{label}</span>
               </label>
             ))}
           </div>
@@ -246,7 +246,7 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
                    text.length <= 0 && inputType === 'text'}
           className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md 
                    hover:bg-indigo-700 transition duration-300 ease-in-out
-                   disabled:bg-gray-400 disabled:cursor-not-allowed"
+                   disabled:bg-gray-400 disabled:cursor-not-allowed bg-[#191825] border border-[#00FF9C] text-[#00FF9C] hover:bg-[#00FF9C]/10 transition-all duration-200 rounded-lg px-6 py-2 shadow-[0_0_10px_rgba(0,255,156,0.2)]"
         >
           Analyze Document
         </button>

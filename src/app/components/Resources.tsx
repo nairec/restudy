@@ -1,10 +1,10 @@
 export default function Resources({ resources }: { resources: string[] }) {
   return (
-    <div className="w-full max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="bg-[#191825] border border-[#00FF9C]/20 rounded-lg p-4 shadow-[0_0_15px_rgba(0,255,156,0.1)]">
       {resources.length > 0 ? (
-        <div className="p-6 bg-white rounded-lg shadow-md">
+      <div className="p-6 bg-white rounded-lg shadow-md">
         <h2 className="text-xl font-bold mb-4 text-indigo-800">Additional Resources</h2>
-        <ul className="list-disc pl-5">
+        <ul className="list-disc pl-5 text-[#00FF9C] hover:text-[#00FF9C]/80 underline transition-colors duration-200">
           {resources.map((resource, index) => (
             <li key={index} className="mb-2">{resource}</li>
           ))}
