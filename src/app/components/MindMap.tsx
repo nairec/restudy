@@ -8,13 +8,13 @@ type ConceptMapViewerProps = {
 
 const MindMap: React.FC<ConceptMapViewerProps> = ({ imageData }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-[#191825] border border-[#00FF9C]/20 rounded-lg p-6 shadow-[0_0_15px_rgba(0,255,156,0.1)]">
       {imageData?(
         <div style={{ width: "100%", height: "100%" }}>
           <h2 className="text-xl font-bold mb-4 text-indigo-800">Mind Map</h2>
         <TransformWrapper>
           {(
-            <div className="relative">
+            <div className="relative border border-[#00FF9C]/30 rounded-lg overflow-hidden">
               <TransformComponent>
                 <Image
                   src={'data:image/png;base64,'+ imageData}
