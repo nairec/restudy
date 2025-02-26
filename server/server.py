@@ -273,4 +273,4 @@ async def process_content(content: str, summary_length: str, question_number: st
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="192.168.1.17", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=PORT)
