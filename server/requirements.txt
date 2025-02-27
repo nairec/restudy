@@ -12,3 +12,4 @@ easyocr
 pillow 
 pdf2image
 pymupdf
+graphviz
