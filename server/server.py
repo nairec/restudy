@@ -22,7 +22,6 @@ from pdf2image import convert_from_bytes
 import easyocr
 import numpy as np
 import fitz
-import graphviz
 from mindmap import generate_mind_map
 
 app = FastAPI()
