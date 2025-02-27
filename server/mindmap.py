@@ -2,6 +2,8 @@ import graphviz
 import hashlib
 import math
 import colorsys
+import os
+import base64
 
 def generate_mind_map(data, output_filename="mind_map", dpi=300):
     """
@@ -14,7 +16,7 @@ def generate_mind_map(data, output_filename="mind_map", dpi=300):
            color='#2A2A2A', fontcolor='white', fontname='Arial', fontsize='14',
            margin='0.4,0.3', height='0.6', width='3.0', penwidth='1.5')
     g.attr('edge', color='#666666', fontcolor='white', fontname='Arial', fontsize='12', 
-           penwidth='1.5')
+           penwidth='1.5', len='0.05')
 
     def generate_id(text):
         return "node_" + hashlib.md5(text.encode('utf-8')).hexdigest()[:8]
@@ -48,7 +50,12 @@ def generate_mind_map(data, output_filename="mind_map", dpi=300):
             create_nodes(category_id, category['subcategories'], colors[i])
     
     g.attr(layout='neato')
-    return g.render(output_filename, format='png', cleanup=True)
+    temp_path = g.render(output_filename, format='png', cleanup=True)
+
+    with open(temp_path, 'rb') as f:
+        encoded_string = base64.b64encode(f.read()).decode('utf-8')
+    os.remove(temp_path)
+    return encoded_string
 
 if __name__ == "__main__":
     test_data = {

@@ -1,3 +1,6 @@
 module.exports = {
-  output: 'export', // Habilita la exportación estática
+  output: 'export',
+  images: {
+    unoptimized: true,
+  },
 };

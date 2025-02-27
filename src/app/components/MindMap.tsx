@@ -7,25 +7,48 @@ type ConceptMapViewerProps = {
 };
 
 const MindMap: React.FC<ConceptMapViewerProps> = ({ imageData }) => {
+ 
+  const handleDownload = () => {
+    const link = document.createElement('a') as unknown as HTMLAnchorElement;
+    link.href = 'data:image/png;base64,' + imageData;
+    link.download = 'mindmap.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+ 
   return (
     <div className="bg-[#191825] border border-[#00FF9C]/20 rounded-lg p-6 shadow-[0_0_15px_rgba(0,255,156,0.1)]">
       {imageData?(
         <div style={{ width: "100%", height: "100%" }}>
-          <h2 className="text-xl font-bold mb-4 text-indigo-800">Mind Map</h2>
-        <TransformWrapper>
-          {(
-            <div className="relative border border-[#00FF9C]/30 rounded-lg overflow-hidden">
-              <TransformComponent>
-                <Image
-                  src={'data:image/png;base64,'+ imageData}
-                  alt="Mapa Conceptual"
-                  width={500}
-                  height={500}
-                />
-              </TransformComponent>
-            </div>
-          )}
-        </TransformWrapper>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-indigo-800">Mind Map</h2>
+            <button
+              onClick={handleDownload}
+              className="flex items-center gap-2 px-4 py-2 bg-[#00FF9C]/10 hover:bg-[#00FF9C]/20 
+                       text-[#00FF9C] rounded-lg transition-all duration-300 border border-[#00FF9C]/30"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+              </svg>
+              Download
+            </button>
+          </div>
+          <TransformWrapper>
+            {(
+              <div className="relative border border-[#00FF9C]/30 rounded-lg overflow-hidden">
+                <TransformComponent>
+                  <Image
+                    src={'data:image/png;base64,'+ encodeURIComponent(imageData)}
+                    alt="Mapa Conceptual"
+                    height={600}
+                    width={800}
+                  />
+                </TransformComponent>
+              </div>
+            )}
+          </TransformWrapper>
       </div>
       ):(
         <div className="flex flex-col items-center justify-center h-64 text-gray-500">
