@@ -22,7 +22,7 @@ const MindMap: React.FC<ConceptMapViewerProps> = ({ imageData }) => {
       {imageData?(
         <div style={{ width: "100%", height: "100%" }}>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-indigo-800">Mind Map</h2>
+            <h2 className="text-xl font-bold text-[#00FF9C]">Mind Map</h2>
             <button
               onClick={handleDownload}
               className="flex items-center gap-2 px-4 py-2 bg-[#00FF9C]/10 hover:bg-[#00FF9C]/20 
@@ -55,7 +55,7 @@ const MindMap: React.FC<ConceptMapViewerProps> = ({ imageData }) => {
           <svg className="w-16 h-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <p className="text-lg font-medium">Mind Map</p>
+          <p className="text-lg font-medium ">Mind Map</p>
           <p className="text-center text-sm">Upload a document to generate a mind map</p>
         </div>
       )}
