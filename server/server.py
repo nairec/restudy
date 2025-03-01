@@ -10,7 +10,6 @@ import groq
 from groq import Groq, RateLimitError
 import json
 import ast
-import spacy
 import networkx as nx
 import matplotlib.pyplot as plt
 from itertools import combinations
@@ -27,8 +26,15 @@ from mindmap import generate_mind_map
 app = FastAPI()
 load_dotenv('.env')
 PORT = os.getenv('PORT')
-GROQ_TOKEN = os.getenv('GROQ_API_KEY2')
-client = Groq(api_key=GROQ_TOKEN)
+
+GROQ_TOKEN_SUMMARY = os.getenv('GROQ_RESTUDY_SUMMARY')
+GROQ_TOKEN_QUESTIONS = os.getenv('GROQ_RESTUDY_QUESTIONS')
+GROQ_TOKEN_MINDMAP = os.getenv('GROQ_RESTUDY_MINDMAP')
+GROQ_TOKEN_RESOURCES = os.getenv('GROQ_RESTUDY_RESOURCES')
+
+summary_client = Groq(api_key=GROQ_TOKEN_SUMMARY)
+questions_client = Groq(api_key=GROQ_TOKEN_QUESTIONS)
+mindmap_client = Groq(api_key=GROQ_TOKEN_MINDMAP)
 
 class TextInput(BaseModel):
     text: str
@@ -109,7 +115,7 @@ def get_doc_content(doc: UploadFile = File(...)):
     
 async def get_summary(content: str, length: str):
     try:
-        chat_completion = client.chat.completions.create(
+        chat_completion = summary_client.chat.completions.create(
             messages=[
                 {
                     "role": "system",
@@ -130,7 +136,7 @@ async def get_summary(content: str, length: str):
         return chat_completion.choices[0].message.content
     except groq.RateLimitError:
         # Fallback to alternative model
-        chat_completion = client.chat.completions.create(
+        chat_completion = summary_client.chat.completions.create(
             messages=[
                 {
                     "role": "system",
@@ -154,7 +160,7 @@ async def get_summary(content: str, length: str):
 
 async def get_questions(content: str, question_number: str, question_difficulty: str):
     try:
-        chat_completion = client.chat.completions.create(
+        chat_completion = questions_client.chat.completions.create(
             messages=[
                 {
                     "role": "system",
@@ -175,7 +181,7 @@ async def get_questions(content: str, question_number: str, question_difficulty:
         return ast.literal_eval(chat_completion.choices[0].message.content)
     except groq.RateLimitError:
         # Fallback to alternative model
-        chat_completion = client.chat.completions.create(
+        chat_completion = questions_client.chat.completions.create(
             messages=[
                 {
                     "role": "system",
@@ -196,14 +202,6 @@ async def get_questions(content: str, question_number: str, question_difficulty:
         return ast.literal_eval(chat_completion.choices[0].message.content)   
     except Exception as e:
         return "There has been an error generating questions."
-
-def extract_keywords(text, nlp):
-    doc = nlp(text)
-    keywords = set()
-    for token in doc:
-        if token.pos_ in ["NOUN", "PROPN"]:  # Extraer sustantivos y nombres propios
-            keywords.add(token.text)
-    return list(keywords)
 
 async def get_mindmap(text: str):
     system_prompt = """You are an expert in conceptual analysis and mind map creation. Follow these instructions precisely:
@@ -247,7 +245,7 @@ async def get_mindmap(text: str):
 
     # Llamada a la API de Groq
     try:
-        response = client.chat.completions.create(
+        response = mindmap_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -258,7 +256,7 @@ async def get_mindmap(text: str):
         )
     except groq.RateLimitError:
         # Fallback to alternative model
-        response = client.chat.completions.create(
+        response = mindmap_client.chat.completions.create(
             model="llama-70b-8192",
             messages=[
                 {"role": "system", "content": system_prompt},
