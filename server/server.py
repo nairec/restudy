@@ -22,6 +22,7 @@ import easyocr
 import numpy as np
 import fitz
 from mindmap import generate_mind_map
+from resources import text_to_search_links
 
 app = FastAPI()
 load_dotenv('.env')
@@ -87,7 +88,6 @@ def get_doc_content(doc: UploadFile = File(...)):
     if doc.filename.endswith('.pdf'):
         pdf_reader = PdfReader(io.BytesIO(fileBytes))
         for page_num, page in enumerate(pdf_reader.pages):
-        # Try to extract text directly (for selectable text)
             page_text = page.extract_text()
             if page_text and page_text.strip():
                 doc_content += page_text
@@ -97,10 +97,9 @@ def get_doc_content(doc: UploadFile = File(...)):
                 pix = page.get_pixmap()
                 img = Image.open(io.BytesIO(pix.tobytes()))
                 
-                # Perform OCR using EasyOCR
-                reader = easyocr.Reader(['en','es'])  # Specify languages here
+                reader = easyocr.Reader(['en','es']) 
                 ocr_result = reader.readtext(np.array(img))
-                ocr_text = " ".join([result[1] for result in ocr_result])  # Extract text from OCR result
+                ocr_text = " ".join([result[1] for result in ocr_result])
                 doc_content += ocr_text
     elif doc.filename.endswith('.docx'):
         doc = Document(io.BytesIO(fileBytes))
@@ -135,7 +134,6 @@ async def get_summary(content: str, length: str):
         )
         return chat_completion.choices[0].message.content
     except groq.RateLimitError:
-        # Fallback to alternative model
         chat_completion = summary_client.chat.completions.create(
             messages=[
                 {
@@ -243,7 +241,6 @@ async def get_mindmap(text: str):
                     - Maintain consistent relationship directionality
                     - Avoid circular references unless absolutely necessary"""
 
-    # Llamada a la API de Groq
     try:
         response = mindmap_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
@@ -255,7 +252,6 @@ async def get_mindmap(text: str):
             max_tokens=1024
         )
     except groq.RateLimitError:
-        # Fallback to alternative model
         response = mindmap_client.chat.completions.create(
             model="llama-70b-8192",
             messages=[
@@ -265,8 +261,7 @@ async def get_mindmap(text: str):
             temperature=0.3,
             max_tokens=1024
         )
-    
-    # Extraer y parsear la respuesta JSON
+
     try:
         response = re.sub(r'```json\s*|\s*```', '', response.choices[0].message.content)
         mindmap_data = ast.literal_eval(response)
@@ -289,6 +284,8 @@ async def process_content(content: str, summary_length: str, question_number: st
         questions = await get_questions(content, question_number, question_difficulty)
     if "mindmap" in analysis_type:
         mindmap = await get_mindmap(content)
+    if "resources" in analysis_type:
+        resources = await text_to_search_links(content, GROQ_TOKEN_RESOURCES)
     
     return {
         "summary": summary,

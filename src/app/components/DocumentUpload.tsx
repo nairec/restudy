@@ -40,7 +40,7 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
     { value: 'summary', label: 'Summary' },
     { value: 'mindmap', label: 'Mind Map' },
     { value: 'questions', label: 'Questions' },
-    { value: 'resources', label: 'Resources (Not implemented yet)' },
+    { value: 'resources', label: 'Resources' },
   ];
 
   const showInfoMessage = (message: string) => {
@@ -73,51 +73,54 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
 
   return (
     <div className="bg-[#191825] rounded-lg shadow-sm p-6">
-      <div>
-        {inputType === 'file' ? (
-          <h2 className="text-white font-semibold mb-4 flex items-center">
-            <Upload className="h-5 w-5 mr-2" />
-            Upload Your Document
-          </h2>
-        ):(
-          <h2 className="text-white font-semibold mb-4 flex items-center">
-            <ClipboardType className="h-5 w-5 mr-2" />
-            Paste your text
-          </h2>
-        )}
-      </div>
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {inputType === 'file' ? (
-          <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium text-white">
-              Choose a document (PDF, DOCX, or TXT)
-            </label>
-            <input
-              type="file"
-              accept=".pdf,.docx,.txt"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-              className="bg-[#191825] border border-[#00FF9C]/20 text-[#191825] rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-[#00FF9C]/50 placeholder-[#00FF9C]/40"
-            />
-            {file && (
-              <p className="text-sm text-white">
-                Selected: {file.name} ({(file.size / 1024 / 1024).toFixed(2)}MB)
-              </p>
-            )}
-          </div>
-        ):(
-          <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium text-white">
-              Paste your text here
-            </label>
-            <textarea
-              rows={5}
-              value={text}
-              onChange={(e) => setText(e.target.value as string)}
-              className="p-2 border border-gray-300 rounded-md text-white bg-[#191825]"
-            />
-          </div>
-        )}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {inputType === 'file' ? (
+                  <div className="flex flex-col space-y-2">
+                    <label className="text-sm font-medium text-white">
+                      Choose a document (PDF, DOCX, or TXT)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept=".pdf,.docx,.txt"
+                        onChange={(e) => setFile(e.target.files?.[0] || null)}
+                        className="hidden"
+                        id="file-upload"
+                      />
+                      <label
+                        htmlFor="file-upload"
+                        className="flex items-center justify-center w-full bg-[#191825] border-2 border-dashed border-[#00FF9C]/20 text-[#00FF9C] rounded-lg p-8 cursor-pointer hover:bg-[#00FF9C]/5 transition-all duration-200"
+                      >
+                        <div className="flex flex-col items-center space-y-2">
+                          <Upload className="h-8 w-8" />
+                          <span className="text-sm">Drop your file here or click to browse</span>
+                        </div>
+                      </label>
+                      {file && (
+                        <p className="text-sm text-[#00FF9C] mt-2 flex items-center">
+                          <Upload className="h-4 w-4 mr-2" />
+                          {file.name} ({(file.size / 1024 / 1024).toFixed(2)}MB)
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col space-y-2">
+                    <label className="text-sm font-medium text-white">
+                      Paste your text here
+                    </label>
+                    <div className="relative">
+                      <textarea
+                        rows={5}
+                        value={text}
+                        onChange={(e) => setText(e.target.value as string)}
+                        placeholder="Type or paste your text here..."
+                        className="w-full p-4 border border-[#00FF9C]/20 rounded-lg text-white bg-[#191825] placeholder-[#00FF9C]/40 focus:outline-none focus:ring-2 focus:ring-[#00FF9C]/50"
+                      />
+                      <ClipboardType className="absolute top-4 right-4 h-5 w-5 text-[#00FF9C]/40" />
+                    </div>
+                  </div>
+                )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="w-full">
