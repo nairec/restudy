@@ -13,3 +13,4 @@ pillow
 pdf2image
 pymupdf
 graphviz
+bs4

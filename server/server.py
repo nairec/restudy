@@ -11,7 +11,6 @@ from groq import Groq, RateLimitError
 import json
 import ast
 import networkx as nx
-import matplotlib.pyplot as plt
 from itertools import combinations
 import base64
 import re
