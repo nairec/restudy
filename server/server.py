@@ -31,6 +31,8 @@ GROQ_TOKEN_SUMMARY = os.getenv('GROQ_RESTUDY_SUMMARY')
 GROQ_TOKEN_QUESTIONS = os.getenv('GROQ_RESTUDY_QUESTIONS')
 GROQ_TOKEN_MINDMAP = os.getenv('GROQ_RESTUDY_MINDMAP')
 GROQ_TOKEN_RESOURCES = os.getenv('GROQ_RESTUDY_RESOURCES')
+SEARCH_ENGINE_ID = os.getenv('GOOGLE_SEARCH_ID')
+SEARCH_API = os.getenv('GOOGLE_SEARCH_KEY')
 
 summary_client = Groq(api_key=GROQ_TOKEN_SUMMARY)
 questions_client = Groq(api_key=GROQ_TOKEN_QUESTIONS)
@@ -50,7 +52,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 @app.get("/")
 async def read_root():
@@ -284,7 +285,7 @@ async def process_content(content: str, summary_length: str, question_number: st
     if "mindmap" in analysis_type:
         mindmap = await get_mindmap(content)
     if "resources" in analysis_type:
-        resources = await text_to_search_links(content, GROQ_TOKEN_RESOURCES)
+        resources = await text_to_search_links(content, GROQ_TOKEN_RESOURCES, SEARCH_API, SEARCH_ENGINE_ID)
     
     return {
         "summary": summary,

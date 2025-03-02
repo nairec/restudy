@@ -13,5 +13,4 @@ pillow
 pdf2image
 pymupdf
 graphviz
-bs4
-requests
+google-api-python-client
