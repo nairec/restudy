@@ -26,6 +26,7 @@ async def text_to_search_links(text, groq_api_key, max_results=5):
     
     # Step 2: Perform Google search with the generated phrase
     search_results = duckduckgo_search(search_phrase, max_results)
+    print(f"Search results: {search_results}")
     
     return search_results
 
