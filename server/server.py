@@ -287,6 +287,14 @@ async def process_content(content: str, summary_length: str, question_number: st
     if "resources" in analysis_type:
         resources = await text_to_search_links(content, GROQ_TOKEN_RESOURCES, SEARCH_API, SEARCH_ENGINE_ID)
     
+    if questions == "There has been an error generating questions.":
+        return {
+            "summary": summary,
+            "mindmap": mindmap,
+            "questions": ["Error"],
+            "answers": [],
+            "resources": resources
+        }
     return {
         "summary": summary,
         "mindmap": mindmap,

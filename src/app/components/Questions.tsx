@@ -46,6 +46,14 @@ const Questions: React.FC<QuestionsProps> = ({ questions, answers }) => {
             </div>
           ))}
         </div>
+      ) : questions.includes('Error') ? (
+        <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+          <svg className="w-16 h-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p className="text-lg font-medium">Practice Questions</p>
+          <p className="text-center text-sm text-yellow-500">An error has ocurred generating questions. The most probable cause is the file or text being too large</p>
+        </div>
       ) : (
         <div className="flex flex-col items-center justify-center h-64 text-gray-500">
           <svg className="w-16 h-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
