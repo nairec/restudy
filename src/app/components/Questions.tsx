@@ -14,7 +14,7 @@ const Questions: React.FC<QuestionsProps> = ({ questions, answers }) => {
 
   return (
     <div className="bg-[#191825] border border-[#00FF9C]/20 rounded-lg p-4 shadow-[0_0_15px_rgba(0,255,156,0.1)]">
-      {questions.length > 0 ? (
+      {questions.length > 0 && !questions.includes('Error') ? (
         <div className="space-y-4">
           <h2 className="text-xl font-bold mb-4 text-[#00FF9C]">Practice Questions</h2>
           {questions.map((question: string, index: number) => (
