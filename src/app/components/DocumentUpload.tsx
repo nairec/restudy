@@ -127,21 +127,40 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
                 )}
         
         <div className="mb-4">
-          <p className="text-sm font-medium text-white mb-2">Select Analysis Types:</p>
-          <div className="space-y-2">
-            {analysisOptions.map(({ value, label }) => (
-              <label key={value} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={selectedAnalysis.includes(value)}
-                  onChange={() => handleAnalysisChange(value)}
-                  className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-                <span className="text-sm text-white">{label}</span>
-              </label>
-            ))}
-          </div>
+  <p className="text-sm font-medium text-white mb-3">Select Analysis Types:</p>
+  <div className="grid grid-cols-2 gap-3">
+    {analysisOptions.map(({ value, label }) => (
+      <label 
+        key={value} 
+        className={`flex items-center p-3 rounded-lg border transition-all duration-200 cursor-pointer
+          ${selectedAnalysis.includes(value) 
+            ? 'border-[#00FF9C] bg-[#00FF9C]/10' 
+            : 'border-[#00FF9C]/20 hover:border-[#00FF9C]/40 hover:bg-[#00FF9C]/5'}`}
+      >
+        <input
+          type="checkbox"
+          checked={selectedAnalysis.includes(value)}
+          onChange={() => handleAnalysisChange(value)}
+          className="sr-only"
+        />
+        <div className={`w-5 h-5 rounded border mr-3 flex items-center justify-center transition-all
+          ${selectedAnalysis.includes(value)
+            ? 'border-[#00FF9C] bg-[#00FF9C]/20'
+            : 'border-[#00FF9C]/30'}`}
+        >
+          {selectedAnalysis.includes(value) && (
+            <svg className="w-3 h-3 text-[#00FF9C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          )}
         </div>
+        <span className={`text-sm ${selectedAnalysis.includes(value) ? 'text-[#00FF9C]' : 'text-white'}`}>
+          {label}
+        </span>
+      </label>
+    ))}
+  </div>
+</div>
         {selectedAnalysis.includes('summary') && (
           <div className="w-full">
           <div className="flex items-center gap-2">
