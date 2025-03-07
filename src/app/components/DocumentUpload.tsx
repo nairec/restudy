@@ -35,6 +35,8 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
   const [text, setText] = useState('');
   const [showMessage, setShowMessage] = useState(false);
   const [currentMessage, setCurrentMessage] = useState('');
+  const [layout, setLayout] = useState<string>("radial");
+  const [theme, setTheme] = useState<string>("dark");
 
   const analysisOptions = [
     { value: 'summary', label: 'Summary' },
@@ -59,6 +61,8 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
     formData.append('question_number', questionNumber.toString());
     formData.append('question_difficulty', difficulty.toString());
     formData.append('analysis_type', selectedAnalysis.toString());
+    formData.append('layout', layout);
+    formData.append('theme', theme);
 
     await onAnalyze(formData);
   };
@@ -122,106 +126,6 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
                   </div>
                 )}
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="w-full">
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-white block">
-                Summary Length (50-500 words)
-              </label>
-              <button 
-                type="button"
-                className="md:hidden text-white"
-                onClick={() => showInfoMessage(`Aproximate length of the summary (if 'Summary' is selected)`)}
-              >
-                <Info className="h-4 w-4 text-white-500" />
-              </button>
-            </div>
-            <input
-              type="number"
-              min="50"
-              max="500"
-              value={summaryLength}
-              onChange={(e) => setSummaryLength(Number(e.target.value))}
-              className="w-full p-2 border rounded-md mt-1 bg-[#191825] text-[#00FF9C] border-[#00FF9C]"
-            />
-            <div className="mt-1 hidden md:block">
-              {(summaryLength >= 50 && summaryLength <= 500) && (
-                <p className="text-sm text-white">
-                  The summary will be approximately {summaryLength} words long.
-                </p>
-              )}
-            </div>
-            {(summaryLength < 50 || summaryLength > 500) && (
-                <p className="text-sm text-red-500">
-                  Please enter a value between 50 and 500
-                </p>
-              )}
-          </div>
-
-          <div className="w-full">
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-white block bg-[#191825]">
-                Number of Questions (1-10)
-              </label>
-              <button 
-                type="button"
-                className="md:hidden text-white"
-                onClick={() => showInfoMessage(`Number of questions that will be generated (if 'Questions' is selected)`)}
-              >
-                <Info className="h-4 w-4 text-white-500" />
-              </button>
-            </div>
-            <input
-              type="number"
-              min="1"
-              max="10"
-              value={questionNumber}
-              onChange={(e) => setQuestionNumber(Number(e.target.value))}
-              className="w-full p-2 border rounded-md mt-1 bg-[#191825] text-[#00FF9C] border-[#00FF9C]"
-            />
-            <div className="mt-1 hidden md:block">
-              {(questionNumber >= 1 && questionNumber <= 10) && (
-                <p className="text-sm text-white">
-                  {questionNumber} questions will be generated
-                </p>
-              )}
-              {(questionNumber < 1 || questionNumber > 10) && (
-                <p className="text-sm text-red-500">
-                  Please enter a value between 1 and 10
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="w-full">
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-white block">
-                Question Difficulty
-              </label>
-              <button 
-                type="button"
-                className="md:hidden text-white"
-                onClick={() => showInfoMessage(`Difficulty level of the generated questions (if 'Questions' is selected) \n 'Further Research Required' means you will need to do further research to answer the questions`)}
-              >
-                <Info className="h-4 w-4 text-white-500" />
-              </button>
-            </div>
-            <select
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value as string)}
-              className="w-full p-2 border rounded-md bg-[#191825] border-[#00FF9C] text-[#00FF9C] hover:bg-[#00FF9C]/10"
-            >
-              <option value="easy">Easy</option>
-              <option value="moderate">Moderate</option>
-              <option value="difficult">Difficult</option>
-              <option value="further research required">Further Research Required</option>
-              <option value="varied">Varied</option>
-            </select>
-            <p className="text-sm text-white mt-1 hidden md:block">
-              Selected difficulty: {difficulty}
-            </p>
-          </div>
-        </div>
         <div className="mb-4">
           <p className="text-sm font-medium text-white mb-2">Select Analysis Types:</p>
           <div className="space-y-2">
@@ -238,8 +142,124 @@ export default function DocumentUpload({ onAnalyze, selectedAnalysis, setSelecte
             ))}
           </div>
         </div>
+        {selectedAnalysis.includes('summary') && (
+          <div className="w-full">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-white block">
+              Summary Length (50-500 words)
+            </label>
+            <button 
+              type="button"
+              className="md:hidden text-white"
+              onClick={() => showInfoMessage(`Aproximate length of the summary (if 'Summary' is selected)`)}
+            >
+              <Info className="h-4 w-4 text-white-500" />
+            </button>
+          </div>
+          <input
+            type="number"
+            min="50"
+            max="500"
+            value={summaryLength}
+            onChange={(e) => setSummaryLength(Number(e.target.value))}
+            className="w-auto p-2 border rounded-md mt-1 bg-[#191825] text-[#00FF9C] border-[#00FF9C]"
+          />
+          <div className="mt-1 hidden md:block">
+          </div>
+          {(summaryLength < 50 || summaryLength > 500) && (
+              <p className="text-sm text-red-500">
+                Please enter a value between 50 and 500
+              </p>
+            )}
+        </div>
+        )}
+        {selectedAnalysis.includes('mindmap') && (
+          <div className="space-y-2">
+          <p className="text-sm font-medium text-white">Mind Map Customization</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            <select
+              value={layout}
+              onChange={(e) => setLayout(e.target.value)}
+              className="px-2 py-1 text-sm bg-[#00FF9C]/10 text-[#00FF9C] rounded-lg border border-[#00FF9C]/30 focus:outline-none focus:border-[#00FF9C]/50 hover:bg-[#00FF9C]/20 transition-all duration-300 cursor-pointer [&>option]:bg-[#191825] [&>option]:text-[#00FF9C]"
+            >
+              <option value="radial">Radial</option>
+              <option value="horizontal">Horizontal</option>
+              <option value="vertical">Vertical</option>
+              <option value="force">Force</option>
+            </select>
+    
+            <select
+              value={theme}
+              onChange={(e) => setTheme(e.target.value)}
+              className="px-2 py-1 text-sm bg-[#00FF9C]/10 text-[#00FF9C] rounded-lg border border-[#00FF9C]/30 focus:outline-none focus:border-[#00FF9C]/50 hover:bg-[#00FF9C]/20 transition-all duration-300 cursor-pointer [&>option]:bg-[#191825] [&>option]:text-[#00FF9C]"
+            >
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+              <option value="green">Green</option>
+            </select>
+          </div>
+        </div>
+        )}
+        {selectedAnalysis.includes('questions') && (
+          <div className="flex flex-col sm:flex-row justify-left sm:space-x-2 space-y-2 sm:space-y-0"> 
+            <div className="w-1/3 sm:w-1/6">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-white block bg-[#191825]">
+                  Number of Questions (1-10)
+                </label>
+                <button 
+                  type="button"
+                  className="md:hidden text-white"
+                  onClick={() => showInfoMessage(`Number of questions that will be generated (if 'Questions' is selected)`)}
+                >
+                  <Info className="h-4 w-4 text-white-500" />
+                </button>
+              </div>
+              <input
+                type="number"
+                min="1"
+                max="10"
+                value={questionNumber}
+                onChange={(e) => setQuestionNumber(Number(e.target.value))}
+                className="w-auto p-2 border rounded-md mt-1 bg-[#191825] text-[#00FF9C] border-[#00FF9C]"
+              />
+              <div className="mt-1 block">
+                {(questionNumber < 1 || questionNumber > 10) && (
+                  <p className="text-sm text-red-500">
+                    Please enter a value between 1 and 10
+                  </p>
+                )}
+              </div>
+            </div>
 
-        <button
+            <div className="w-full sm:w-1/3">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-white block">
+                  Question Difficulty
+                </label>
+                <button 
+                  type="button"
+                  className="md:hidden text-white"
+                  onClick={() => showInfoMessage(`Difficulty level of the generated questions (if 'Questions' is selected) \n 'Further Research Required' means you will need to do further research to answer the questions`)}
+                >
+                  <Info className="h-4 w-4 text-white-500" />
+                </button>
+              </div>
+              <select
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value as string)}
+                className="w-auto p-2 border rounded-md bg-[#191825] border-[#00FF9C] text-[#00FF9C] hover:bg-[#00FF9C]/10 [&>option]:hover:bg-[#191825]"
+              >
+                <option value="easy">Easy</option>
+                <option value="moderate">Moderate</option>
+                <option value="difficult">Difficult</option>
+                <option value="further research required">Further Research Required</option>
+                <option value="varied">Varied</option>
+              </select>
+            </div>
+          </div>
+        )}
+                <button
           type="submit"
           disabled={!file && inputType === 'file' || 
                    summaryLength < 50 || 

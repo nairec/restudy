@@ -20,8 +20,9 @@ from pdf2image import convert_from_bytes
 import easyocr
 import numpy as np
 import fitz
-from mindmap import generate_mind_map
 from resources import text_to_search_links
+from mindmap_v2 import create_mind_map
+import json
 
 app = FastAPI()
 load_dotenv('.env')
@@ -44,6 +45,8 @@ class TextInput(BaseModel):
     question_number: str
     question_difficulty: str
     analysis_type: str
+    layout: str
+    theme: str
 
 app.add_middleware(
     CORSMiddleware,
@@ -64,7 +67,9 @@ async def analyze_content(
     summary_length: str = Form(...),
     question_number: str = Form(...),
     question_difficulty: str = Form(...),
-    analysis_type: str = Form(...)
+    analysis_type: str = Form(...),
+    layout: str = Form(...),
+    theme: str = Form(...)
 ):
     if document:
         content = get_doc_content(document)
@@ -78,7 +83,9 @@ async def analyze_content(
         summary_length,
         question_number,
         question_difficulty,
-        analysis_type
+        analysis_type,
+        layout,
+        theme
     )
 
 def get_doc_content(doc: UploadFile = File(...)):
@@ -138,7 +145,7 @@ async def get_summary(content: str, length: str):
             messages=[
                 {
                     "role": "system",
-                    "content": f"You are an experienced educational assistant with a deep understanding of various subjects and a talent for breaking down complex information into digestible summaries. Your expertise lies in creating summaries that not only condense information but also enhance the student's comprehension and retention of the topic. Your task is to summarize a given text in a way that facilitates the student's learning. Please keep in mind the following aspects while summarizing: - Focus on the key concepts and main ideas.- Use clear and straightforward language suitable for students.- Highlight any important terminology or definitions.- Incorporate examples or analogies if they would aid in understanding. - Your response must be the closest possible to the following length: {length} words and must ONLY contain the summary - DO NOT include any phrase like 'Here is the summary:'."
+                    "content": f"You are an experienced educational assistant with a deep understanding of various subjects and a talent for breaking down complex information into digestible summaries. Your expertise lies in creating summaries that not only condense information but also enhance the student's comprehension and retention of the topic. Your task is to summarize a given text in a way that facilitates the student's learning. Please keep in mind the following aspects while summarizing: - Focus on the key concepts and main ideas.- Use clear and straightforward language suitable for students.- Highlight any important terminology or definitions.- Incorporate examples or analogies if they would aid in understanding.- Incorporate useful resources like bulleted lists and differenciated paragraphs if needed. - Your response must be the closest possible to the following length: {length} words and must ONLY contain the summary - DO NOT include any phrase like 'Here is the summary:'."
                 },
                 {
                     "role": "user",
@@ -162,7 +169,7 @@ async def get_questions(content: str, question_number: str, question_difficulty:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an experienced educational consultant with a deep understanding of effective learning strategies and critical thinking techniques. Your specialty lies in generating insightful questions that encourage deeper engagement with the material and help students expand their knowledge. Your task is to generate smart questions related to a given text to facilitate student learning. Here are the details you need to keep in mind: - The questions should have the following difficulty: " + question_difficulty + " ('varied' difficulty means a set of easy, moderate and hard questions and 'Further research required' means that the user should not be able to answer the questions without researching other sources). - Aim for exactly " + question_number + " questions that cover different aspects of the text, such as themes, character motivations, implications, and real-world applications. - ALWAYS answer with a json-like structured output EXACTLY like the following: {'questions': ['question1','question2'], 'answers': ['answer1','answer2']}"
+                    "content": "You are an experienced educational consultant with a deep understanding of effective learning strategies and critical thinking techniques. Your specialty lies in generating insightful questions that encourage deeper engagement with the material and help students expand their knowledge. Your task is to generate smart questions related to a given text to facilitate student learning. Here are the details you need to keep in mind: - The questions should have the following difficulty: " + question_difficulty + " ('varied' difficulty means a set of easy, moderate and hard questions and 'Further research required' means that the user should not be able to answer the questions without researching other sources). - Aim for exactly " + question_number + " questions that cover different aspects of the text, such as themes, character motivations, implications, and real-world applications. - ALWAYS include the answer to the questions even with the 'Further research required' selected and do not confuse the question signs (?) with exclamation signs (!). - ALWAYS answer with a json-like structured output EXACTLY like the following: {'questions': ['question1','question2'], 'answers': ['answer1','answer2']}. - Finish and complete the JSON in all cases, do not leave it incompleted."
                 },
                 {
                     "role": "user",
@@ -183,14 +190,14 @@ async def get_questions(content: str, question_number: str, question_difficulty:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an experienced educational consultant with a deep understanding of effective learning strategies and critical thinking techniques. Your specialty lies in generating insightful questions that encourage deeper engagement with the material and help students expand their knowledge. Your task is to generate smart questions related to a given text to facilitate student learning. Here are the details you need to keep in mind: - The questions should have the following difficulty: " + question_difficulty + " ('varied' difficulty means a set of easy, moderate and hard questions and 'Further research required' means that the user should not be able to answer the questions without researching other sources). - Aim for exactly " + question_number + " questions that cover different aspects of the text, such as themes, character motivations, implications, and real-world applications. - ALWAYS answer with a json-like structured output EXACTLY like the following: {'questions': ['question1','question2'], 'answers': ['answer1','answer2']}"
+                    "content": "You are an experienced educational consultant with a deep understanding of effective learning strategies and critical thinking techniques. Your specialty lies in generating insightful questions that encourage deeper engagement with the material and help students expand their knowledge. Your task is to generate smart questions related to a given text to facilitate student learning. Here are the details you need to keep in mind: - The questions should have the following difficulty: " + question_difficulty + " ('varied' difficulty means a set of easy, moderate and hard questions and 'Further research required' means that the user should not be able to answer the questions without researching other sources). - Aim for exactly " + question_number + " questions that cover different aspects of the text, such as themes, character motivations, implications, and real-world applications. - ALWAYS include the answer to the questions even with the 'Further research required' selected and do not confuse the question signs (?) with exclamation signs (!). - ALWAYS answer with a json-like structured output EXACTLY like the following: {'questions': ['question1','question2'], 'answers': ['answer1','answer2']}. - Finish and complete the JSON in all cases, do not leave it incompleted."
                 },
                 {
                     "role": "user",
                     "content": f"TEXT TO GENERATE QUESTIONS FROM: {content}",
                 }
             ],
-            model="llama-70b-8192",
+            model="deepseek-r1-distill-llama-70b",
             temperature=0.5,
             max_completion_tokens=1024,
             top_p=1,
@@ -201,7 +208,7 @@ async def get_questions(content: str, question_number: str, question_difficulty:
     except Exception as e:
         return "There has been an error generating questions."
 
-async def get_mindmap(text: str):
+async def get_mindmap(text: str, layout: str, theme: str):
     system_prompt = """You are an expert in conceptual analysis and mind map creation. Follow these instructions precisely:
 
                     1. Analyze the provided text and identify the most important key cateogries. DO NOT insert more than 5 categories
@@ -268,11 +275,11 @@ async def get_mindmap(text: str):
     except (AttributeError, json.JSONDecodeError) as e:
         raise ValueError("Error parsing model response") from e
 
-    mindmap_img = generate_mind_map(mindmap_data)
+    mindmap_o = create_mind_map(mindmap_data, "mind_map", 300, theme, layout)
     
-    return mindmap_img
+    return json.dumps(mindmap_o)
 
-async def process_content(content: str, summary_length: str, question_number: str, question_difficulty: str, analysis_type: str):
+async def process_content(content: str, summary_length: str, question_number: str, question_difficulty: str, analysis_type: str, layout: str, theme: str):
     summary = ""
     questions = {}
     mindmap = ""
@@ -283,7 +290,7 @@ async def process_content(content: str, summary_length: str, question_number: st
     if "questions" in analysis_type:
         questions = await get_questions(content, question_number, question_difficulty)
     if "mindmap" in analysis_type:
-        mindmap = await get_mindmap(content)
+        mindmap = await get_mindmap(content, layout, theme)
     if "resources" in analysis_type:
         resources = await text_to_search_links(content, GROQ_TOKEN_RESOURCES, SEARCH_API, SEARCH_ENGINE_ID)
     
@@ -306,4 +313,4 @@ async def process_content(content: str, summary_length: str, question_number: st
 if __name__ == "__main__":
     import uvicorn
     
-    uvicorn.run(app, host="0.0.0.0", port=PORT)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

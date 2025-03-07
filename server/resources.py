@@ -22,11 +22,9 @@ async def text_to_search_links(text, groq_api_key, google_api_key, google_cse_id
     """
     # Step 1: Generate search phrase with Groq API
     search_phrase = generate_search_phrase_with_groq(text, groq_api_key)
-    print(f"Generated search phrase: {search_phrase}")
     
     # Step 2: Perform Google search with the generated phrase
     search_results = google_search(search_phrase, google_api_key, google_cse_id, max_results)
-    print(f"Search results: {search_results}")
     
     return search_results
 
