@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import Image from "next/image"
   type ConceptMapViewerProps = {
@@ -13,7 +12,6 @@ import Image from "next/image"
   };
 
   const MindMap: React.FC<ConceptMapViewerProps> = ({ imageData, metadata }) => {
-
 
     const handleDownload = () => {
       const link = document.createElement('a') as unknown as HTMLAnchorElement;

@@ -9,7 +9,6 @@ import Questions from './components/Questions';
 import Resources from './components/Resources';
 import LoadingOverlay from './components/LoadingOverlay';
 import GridLayout from './components/GridLayout';
-import { metadata } from './layout';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
