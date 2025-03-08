@@ -20,7 +20,7 @@ export default function Home() {
     try {
       setIsLoading(true);
       
-      const response = await fetch('https://restudy.onrender.com/analyze-content', {
+      const response = await fetch('https://restudyserver.onrender.com/analyze-content', {
         method: 'POST',
         body: formData,
       });
