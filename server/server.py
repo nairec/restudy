@@ -23,6 +23,7 @@ import fitz
 from resources import text_to_search_links
 from mindmap_v2 import create_mind_map
 import json
+import asyncio
 
 app = FastAPI()
 load_dotenv('.env')
@@ -89,36 +90,51 @@ async def analyze_content(
     )
 
 def get_doc_content(doc: UploadFile = File(...)):
-
+    chunk_size = 1024 * 1024  # 1MB chunks
     doc_content = ""
-    fileBytes = doc.file.read()
+    
+    # Read file in chunks
+    fileBytes = b''
+    for chunk in iter(lambda: doc.file.read(chunk_size), b''):
+        fileBytes += chunk
+
     if doc.filename.endswith('.pdf'):
-        pdf_reader = PdfReader(io.BytesIO(fileBytes))
-        for page_num, page in enumerate(pdf_reader.pages):
-            page_text = page.extract_text()
-            if page_text and page_text.strip():
-                doc_content += page_text
-            else:
-                pdf_document = fitz.open(stream=fileBytes, filetype="pdf")
-                page = pdf_document.load_page(page_num)
-                pix = page.get_pixmap()
-                img = Image.open(io.BytesIO(pix.tobytes()))
-                
-                reader = easyocr.Reader(['en','es']) 
-                ocr_result = reader.readtext(np.array(img))
-                ocr_text = " ".join([result[1] for result in ocr_result])
-                doc_content += ocr_text
+        try:
+            pdf_reader = PdfReader(io.BytesIO(fileBytes))
+            for page_num, page in enumerate(pdf_reader.pages):
+                page_text = page.extract_text()
+                if page_text and page_text.strip():
+                    doc_content += page_text
+                else:
+                    # Handle scanned PDFs with OCR
+                    pdf_document = fitz.open(stream=fileBytes, filetype="pdf")
+                    page = pdf_document.load_page(page_num)
+                    pix = page.get_pixmap()
+                    img = Image.open(io.BytesIO(pix.tobytes()))
+                    
+                    reader = easyocr.Reader(['en','es'])
+                    ocr_result = reader.readtext(np.array(img))
+                    ocr_text = " ".join([result[1] for result in ocr_result])
+                    doc_content += ocr_text
+                    
+                    pdf_document.close()
+        except Exception as e:
+            raise ValueError(f"Error processing PDF: {str(e)}")
+            
     elif doc.filename.endswith('.docx'):
-        doc = Document(io.BytesIO(fileBytes))
-        for paragraph in doc.paragraphs:
-            doc_content += paragraph.text + "\n"
+        try:
+            doc = Document(io.BytesIO(fileBytes))
+            for paragraph in doc.paragraphs:
+                doc_content += paragraph.text + "\n"
+        except Exception as e:
+            raise ValueError(f"Error processing DOCX: {str(e)}")
+            
     elif doc.filename.endswith('.txt'):
-        doc_content = fileBytes
+        doc_content = fileBytes.decode('utf-8')
     else:
         raise ValueError("Unsupported file format")
 
-    return doc_content
-    
+    return doc_content    
 async def get_summary(content: str, length: str):
     try:
         chat_completion = summary_client.chat.completions.create(
@@ -280,37 +296,45 @@ async def get_mindmap(text: str, layout: str, theme: str):
     return json.dumps(mindmap_o)
 
 async def process_content(content: str, summary_length: str, question_number: str, question_difficulty: str, analysis_type: str, layout: str, theme: str):
-    summary = ""
-    questions = {}
-    mindmap = ""
-    resources = []
-
-    if "summary" in analysis_type:
-        summary = await get_summary(content, summary_length)
-    if "questions" in analysis_type:
-        questions = await get_questions(content, question_number, question_difficulty)
-    if "mindmap" in analysis_type:
-        mindmap = await get_mindmap(content, layout, theme)
-    if "resources" in analysis_type:
-        resources = await text_to_search_links(content, GROQ_TOKEN_RESOURCES, SEARCH_API, SEARCH_ENGINE_ID)
+    tasks = []
+    analysis_order = []
     
-    if questions == "There has been an error generating questions.":
-        return {
-            "summary": summary,
-            "mindmap": mindmap,
-            "questions": ["Error"],
-            "answers": [],
-            "resources": resources
-        }
-    return {
-        "summary": summary,
-        "mindmap": mindmap,
-        "questions": questions.get('questions', []),
-        "answers": questions.get('answers', []),
-        "resources": resources
+    if "summary" in analysis_type:
+        tasks.append(get_summary(content, summary_length))
+        analysis_order.append("summary")
+    if "questions" in analysis_type:
+        tasks.append(get_questions(content, question_number, question_difficulty))
+        analysis_order.append("questions")
+    if "mindmap" in analysis_type:
+        tasks.append(get_mindmap(content, layout, theme))
+        analysis_order.append("mindmap")
+    if "resources" in analysis_type:
+        tasks.append(text_to_search_links(content, GROQ_TOKEN_RESOURCES, SEARCH_API, SEARCH_ENGINE_ID))
+        analysis_order.append("resources")
+        
+    results = await asyncio.gather(*tasks)
+    
+    response = {
+        "summary": "",
+        "mindmap": "",
+        "questions": [],
+        "answers": [],
+        "resources": []
     }
-
+    
+    for i, analysis_type in enumerate(analysis_order):
+        if analysis_type == "summary":
+            response["summary"] = results[i]
+        elif analysis_type == "questions":
+            response["questions"] = results[i].get('questions', [])
+            response["answers"] = results[i].get('answers', [])
+        elif analysis_type == "mindmap":
+            response["mindmap"] = results[i]
+        elif analysis_type == "resources":
+            response["resources"] = results[i]
+            
+    return response
 if __name__ == "__main__":
     import uvicorn
     
-    uvicorn.run(app, host="0.0.0.0", port=PORT)
+    uvicorn.run("server:app", host="0.0.0.0", port=8000, workers=4, limit_concurrency=50)

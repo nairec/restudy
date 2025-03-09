@@ -20,7 +20,7 @@ export default function Home() {
     try {
       setIsLoading(true);
       
-      const response = await fetch('https://restudyserver.onrender.com/analyze-content', {
+      const response = await fetch('http://192.168.1.71:8000/analyze-content', {
         method: 'POST',
         body: formData,
       });
@@ -99,7 +99,8 @@ export default function Home() {
               answers={results['answers'] || []} 
             />
             <MindMap 
-              imageData={ results['mindmap'] === '' ? "" : JSON.parse(results['mindmap']).png}
+              imageData={ results['mindmap'] === '' ? "" : JSON.parse(results['mindmap']).svg}
+              metadata={ results['mindmap'] === '' ? "" : JSON.parse(results['mindmap']).metadata}
             />
             <Resources resources={results['resources'] || []} />
           </GridLayout>

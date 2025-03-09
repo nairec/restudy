@@ -41,7 +41,7 @@ class MindMapGenerator:
                 "bg": "#191825", 
                 "node": "#2A2A2A", 
                 "text": "white",
-                "center": "#00FF9C",
+                "center": "#00cc7d",
                 "edge": "#666666"
             },
             "light": {
@@ -87,45 +87,33 @@ class MindMapGenerator:
             ) for i in range(num_categories)]
 
     def create_nodes(self, g: graphviz.Digraph, parent_id: str, items: List[Dict], 
-                     color: str, metadata: Dict[str, List[str]], level: int = 1) -> None:
-        """
-        Recursively create nodes and edges for the mind map.
-        
-        Args:
-            g: Graphviz graph to add nodes to
-            parent_id: ID of the parent node
-            items: List of items to create nodes for
-            color: Color for the nodes
-            metadata: Dictionary to store node relationships and IDs
-            level: Current depth level in the hierarchy
-        """
+                 color: str, metadata: Dict[str, List[str]], level: int = 1) -> None:
+                
         for item in items:
             node_id = self.generate_id(item['text'])
             metadata["all_nodes"].append(node_id)
             
-            # If this is a child of a node, record the relationship
+            # Add node color to metadata for frontend matching
+            metadata["node_colors"] = metadata.get("node_colors", {})
+            metadata["node_colors"][node_id] = color
+            
             if parent_id != "center":
                 metadata["node_relationships"].append((parent_id, node_id))
             
-            # Font size decreases slightly with depth
             font_size = max(12, 16 - (level * 0.5))
-            
-            # Add tooltip with full description
             tooltip = item['description'].replace('"', '\'')
             
-            # Create node with HTML-like label for better formatting
             label = f"<<table border='0' cellpadding='5'><tr><td><b>{item['text']}</b></td></tr>"
-            
-            # Only show truncated description in the node
-            if len(item['description']) > 60:
-                description = item['description'][:57] + "..."
-            else:
-                description = item['description']
-                
+            description = item['description'][:57] + "..." if len(item['description']) > 60 else item['description']
             label += f"<tr><td>{description}</td></tr></table>>"
             
-            g.node(node_id, label, fillcolor=color, color=color, fontsize=str(font_size), 
-                   tooltip=tooltip)
+            # Set fill and stroke color attributes
+            g.node(node_id, label, 
+                fillcolor=color,
+                color=color,
+                style='filled',
+                fontsize=str(font_size),
+                tooltip=tooltip)
             
             # Add edge with custom attributes
             g.edge(parent_id, node_id, tooltip=f"Connection: {item['text']}")
@@ -166,11 +154,26 @@ class MindMapGenerator:
         
         # Create graph with appropriate layout engine
         engine = "neato" if layout in ["radial", "force"] else "dot"
-        g = graphviz.Digraph('mind_map', format='png', engine=engine)
+        g = graphviz.Digraph('mind_map', format='svg', engine=engine)
         
         # Base attributes
-        g.attr(rankdir=rankdir, bgcolor=current_theme["bg"], fontcolor=current_theme["text"], 
-               fontname='Arial', margin='0.2', overlap='false', splines='true', dpi=str(dpi))
+        g.attr(
+            rankdir=rankdir,
+            bgcolor=current_theme["bg"],
+            fontcolor=current_theme["text"],
+            fontname='Arial',
+            center='true',
+            size="4,4",
+            dpi="72",
+            ratio="fill",
+            ranksep='2.0',    # Increase vertical spacing between ranks
+            nodesep='1.0',    # Increase horizontal spacing between nodes
+            overlap='false',   # Prevent node overlap
+            splines='ortho',  # Use orthogonal lines for clearer connections
+            margin="0.2",
+            style='filled',  # Add this to ensure background fills entire SVG
+            fillcolor=current_theme["bg"]  # Add this to match theme background
+        )
         # Node styling
         if layout == "vertical":
             g.attr('node', shape='box', style='rounded,filled', fillcolor=current_theme["node"],
@@ -187,7 +190,7 @@ class MindMapGenerator:
         fontsize='14', margin='0.4,0.3', height='0.6', width='3.0', penwidth='1.5')
             
             g.attr('edge', color=current_theme["edge"], fontcolor=current_theme["text"], 
-        fontname='Arial', fontsize='12', penwidth='1.5', len='0.05')
+        fontname='Arial', fontsize='12', penwidth='1.5', len='1')
         # Store metadata for frontend interactivity
         metadata = {
             "all_nodes": ["center"],
@@ -240,19 +243,19 @@ class MindMapGenerator:
         if layout == "radial":
             g.graph_attr['root'] = center_id
         
-        # Generate PNG version
-        png_path = g.render(output_filename, format='png', cleanup=True)
-        
-        # Read and encode PNG file
-        with open(png_path, 'rb') as f:
-            png_encoded = base64.b64encode(f.read()).decode('utf-8')
+        # Generate svg version
+        svg_path = g.render(output_filename, format='svg', cleanup=True)
+    
+        # Read SVG file
+        with open(svg_path, 'r', encoding='utf-8') as f:
+            svg_content = f.read()
         
         # Clean up temporary file
-        os.remove(png_path)
+        os.remove(svg_path)
         
-        # Return the encoded image and metadata
+        # Return the SVG content and metadata
         return {
-            "png": png_encoded,
+            "svg": svg_content,
             "metadata": metadata,
             "theme": theme,
             "layout": layout
@@ -266,14 +269,6 @@ def create_mind_map(data: Dict[str, Any], output_filename: str, dpi: int, theme:
     result = generator.generate_mind_map(
         data, output_filename=output_filename, dpi=dpi, theme=theme, layout=layout
     )
-    
-    # Save result to JSON file
-    output_json = f"{output_filename}.json"
-    with open(output_json, 'w') as f:
-        json.dump(result, f)
-    
-    print(f"Mind map generated and saved to {output_filename}.png")
-    print(f"Metadata saved to {output_json}")
 
     return result
 
