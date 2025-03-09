@@ -337,4 +337,4 @@ async def process_content(content: str, summary_length: str, question_number: st
 if __name__ == "__main__":
     import uvicorn
     
-    uvicorn.run("server:app", host="0.0.0.0", port=8000, workers=4, limit_concurrency=50)
+    uvicorn.run("server:app", host="0.0.0.0", port=PORT, workers=4, limit_concurrency=50)
