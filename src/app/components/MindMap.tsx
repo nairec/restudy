@@ -1,5 +1,5 @@
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 type NodeState = {
   hidden: boolean;
