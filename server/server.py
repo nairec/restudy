@@ -327,8 +327,11 @@ async def process_content(content: str, summary_length: str, question_number: st
         if analysis_type == "summary":
             response["summary"] = results[i]
         elif analysis_type == "questions":
-            response["questions"] = results[i]['questions']
-            response["answers"] = results[i]['answers']
+            if (type(results)==str):
+                response["questions"] = ['Error']
+            else:
+                response["questions"] = results[i]['questions']
+                response["answers"] = results[i]['answers']
         elif analysis_type == "mindmap":
             response["mindmap"] = results[i]
         elif analysis_type == "resources":

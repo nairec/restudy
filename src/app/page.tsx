@@ -11,6 +11,7 @@ import LoadingOverlay from './components/LoadingOverlay';
 import GridLayout from './components/GridLayout';
 
 export default function Home() {
+  const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [selectedAnalysis, setSelectedAnalysis] = useState<string[]>(['summary']);
@@ -53,46 +54,62 @@ export default function Home() {
       </nav>
       <main className="bg-[#191825] max-w-7xl mx-auto py-4 sm:py-6 px-3 sm:px-4">
         <div className="rounded-lg border border-[#00FF9C]/20 shadow-[0_0_20px_rgba(0,255,156,0.15)] p-3 sm:p-4 mb-4 sm:mb-6">
-          <div className="mb-4 sm:mb-6">
-            <div className="flex flex-wrap border-b border-[#00FF9C]/20">
-              <button
-                className={`py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium flex-1 sm:flex-none ${
-                  inputType === 'file'
-                    ? 'text-[#00FF9C] border-b-2 border-[#00FF9C]'
-                    : 'text-[#00FF9C]/60 hover:text-[#00FF9C] transition-colors duration-200'
-                }`}
-                onClick={() => setInputType('file')}
-              >
-                <div className="flex items-center justify-center">
-                  <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                  Upload File
-                </div>
-              </button>
-              <button
-                className={`py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium flex-1 sm:flex-none ${
-                  inputType === 'text'
-                    ? 'text-[#00FF9C] border-b-2 border-[#00FF9C]'
-                    : 'text-[#00FF9C]/60 hover:text-[#00FF9C] transition-colors duration-200'
-                }`}
-                onClick={() => setInputType('text')}
-              >
-                <div className="flex items-center justify-center">
-                  <ClipboardType className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                  Paste Text
-                </div>
-              </button>
-            </div>
+          <div 
+            className="flex items-center justify-center gap-2 cursor-pointer mb-1" 
+            onClick={() => setIsUploadVisible(!isUploadVisible)}
+          >
+            <h2 className="text-[#00FF9C] text-lg font-medium">Upload a document and analyze</h2>
+            <svg 
+              className={`w-6 h-6 text-[#00FF9C] transform transition-transform duration-300 ${isUploadVisible ? 'rotate-180' : ''}`} 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
           </div>
-          <DocumentUpload 
-            onAnalyze={handleAnalyze} 
-            selectedAnalysis={selectedAnalysis}
-            setSelectedAnalysis={setSelectedAnalysis}
-            inputType={inputType}
-          />
+          
+          <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isUploadVisible ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div className="mb-4 sm:mb-6">
+              <div className="flex flex-wrap border-b border-[#00FF9C]/20">
+                <button
+                  className={`py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium flex-1 sm:flex-none ${
+                    inputType === 'file'
+                      ? 'text-[#00FF9C] border-b-2 border-[#00FF9C]'
+                      : 'text-[#00FF9C]/60 hover:text-[#00FF9C] transition-colors duration-200'
+                  }`}
+                  onClick={() => setInputType('file')}
+                >
+                  <div className="flex items-center justify-center">
+                    <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    Upload File
+                  </div>
+                </button>
+                <button
+                  className={`py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium flex-1 sm:flex-none ${
+                    inputType === 'text'
+                      ? 'text-[#00FF9C] border-b-2 border-[#00FF9C]'
+                      : 'text-[#00FF9C]/60 hover:text-[#00FF9C] transition-colors duration-200'
+                  }`}
+                  onClick={() => setInputType('text')}
+                >
+                  <div className="flex items-center justify-center">
+                    <ClipboardType className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    Paste Text
+                  </div>
+                </button>
+              </div>
+            </div>
+            <DocumentUpload 
+              onAnalyze={handleAnalyze} 
+              selectedAnalysis={selectedAnalysis}
+              setSelectedAnalysis={setSelectedAnalysis}
+              inputType={inputType}
+            />
+          </div>
         </div>
         
-        {results ? (
-          <GridLayout>
+        {results ? (          <GridLayout>
             <Summary text={results['summary'] || ""} />
             <Questions 
               questions={results['questions'] || []} 
