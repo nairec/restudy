@@ -199,6 +199,7 @@ async def get_questions(content: str, question_number: str, question_difficulty:
             stop=None,
             stream=False,
         )
+        print(ast.literal_eval(chat_completion.choices[0].message.content))
         return ast.literal_eval(chat_completion.choices[0].message.content)
     except groq.RateLimitError:
         # Fallback to alternative model
@@ -326,8 +327,8 @@ async def process_content(content: str, summary_length: str, question_number: st
         if analysis_type == "summary":
             response["summary"] = results[i]
         elif analysis_type == "questions":
-            response["questions"] = results[i].get('questions', [])
-            response["answers"] = results[i].get('answers', [])
+            response["questions"] = results[i]['questions']
+            response["answers"] = results[i]['answers']
         elif analysis_type == "mindmap":
             response["mindmap"] = results[i]
         elif analysis_type == "resources":
