@@ -10,6 +10,9 @@
 !.yarn/releases
 !.yarn/versions
 
+# in development
+chatbot.py
+
 # testing
 /coverage
 

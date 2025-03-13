@@ -185,11 +185,11 @@ async def get_questions(content: str, question_number: str, question_difficulty:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an experienced educational consultant with a deep understanding of effective learning strategies and critical thinking techniques. Your specialty lies in generating insightful questions that encourage deeper engagement with the material and help students expand their knowledge. Your task is to generate smart questions related to a given text to facilitate student learning. Here are the details you need to keep in mind: - The questions should have the following difficulty: " + question_difficulty + " ('varied' difficulty means a set of easy, moderate and hard questions and 'Further research required' means that the user should not be able to answer the questions without researching other sources). - Aim for exactly " + question_number + " questions that cover different aspects of the text, such as themes, character motivations, implications, and real-world applications. - ALWAYS include the answer to the questions even with the 'Further research required' selected and do not confuse the question signs (?) with exclamation signs (!). - ALWAYS answer with a json-like structured output EXACTLY like the following: {'questions': ['question1','question2'], 'answers': ['answer1','answer2']}. - Finish and complete the JSON in all cases, do not leave it incompleted."
+                    "content": f"You are an experienced educational consultant. Format your response EXACTLY as a Python dictionary string: {{'questions': ['question1', 'question2'], 'answers': ['answer1', 'answer2']}}. Generate {question_number} insightful questions with {question_difficulty} difficulty (easy: easy; moderate: moderate; difficult: difficult; further research required: The user will have to research outside the given document for answering. this means the questions should be very thought-provoking; varied: a mix of various difficulties) Include question marks (?) and provide answers for all questions."
                 },
                 {
-                    "role": "user",
-                    "content": f"TEXT TO GENERATE QUESTIONS FROM: {content}",
+                    "role": "user", 
+                    "content": f"TEXT TO GENERATE QUESTIONS FROM: {content}"
                 }
             ],
             model="llama-3.3-70b-versatile",
@@ -197,21 +197,20 @@ async def get_questions(content: str, question_number: str, question_difficulty:
             max_completion_tokens=1024,
             top_p=1,
             stop=None,
-            stream=False,
+            stream=False
         )
-        print(ast.literal_eval(chat_completion.choices[0].message.content))
-        return ast.literal_eval(chat_completion.choices[0].message.content)
+        return eval(chat_completion.choices[0].message.content)
     except groq.RateLimitError:
-        # Fallback to alternative model
+        # Same modification for the fallback model
         chat_completion = questions_client.chat.completions.create(
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an experienced educational consultant with a deep understanding of effective learning strategies and critical thinking techniques. Your specialty lies in generating insightful questions that encourage deeper engagement with the material and help students expand their knowledge. Your task is to generate smart questions related to a given text to facilitate student learning. Here are the details you need to keep in mind: - The questions should have the following difficulty: " + question_difficulty + " ('varied' difficulty means a set of easy, moderate and hard questions and 'Further research required' means that the user should not be able to answer the questions without researching other sources). - Aim for exactly " + question_number + " questions that cover different aspects of the text, such as themes, character motivations, implications, and real-world applications. - ALWAYS include the answer to the questions even with the 'Further research required' selected and do not confuse the question signs (?) with exclamation signs (!). - ALWAYS answer with a json-like structured output EXACTLY like the following: {'questions': ['question1','question2'], 'answers': ['answer1','answer2']}. - Finish and complete the JSON in all cases, do not leave it incompleted."
+                    "content": f"You are an experienced educational consultant. Format your response EXACTLY as a Python dictionary string: {{'questions': ['question1', 'question2'], 'answers': ['answer1', 'answer2']}}. Generate {question_number} insightful questions with {question_difficulty} difficulty. (easy: easy; moderate: moderate; difficult: difficult; further research required: The user will have to research outside the given document for answering. this means the questions should be very thought-provoking; varied: a mix of various difficulties) Include question marks (?) and provide answers for all questions."
                 },
                 {
                     "role": "user",
-                    "content": f"TEXT TO GENERATE QUESTIONS FROM: {content}",
+                    "content": f"TEXT TO GENERATE QUESTIONS FROM: {content}"
                 }
             ],
             model="deepseek-r1-distill-llama-70b",
@@ -219,10 +218,11 @@ async def get_questions(content: str, question_number: str, question_difficulty:
             max_completion_tokens=1024,
             top_p=1,
             stop=None,
-            stream=False,
+            stream=False
         )
-        return ast.literal_eval(chat_completion.choices[0].message.content)   
+        return eval(chat_completion.choices[0].message.content)
     except Exception as e:
+        print("Error generating questions: ", e)
         return "There has been an error generating questions."
 
 async def get_mindmap(text: str, layout: str, theme: str):
@@ -327,7 +327,8 @@ async def process_content(content: str, summary_length: str, question_number: st
         if analysis_type == "summary":
             response["summary"] = results[i]
         elif analysis_type == "questions":
-            if (type(results)==str):
+            if (type(results[i])==str):
+                console.log("Error generating questions")
                 response["questions"] = ['Error']
             else:
                 response["questions"] = results[i]['questions']
@@ -341,4 +342,4 @@ async def process_content(content: str, summary_length: str, question_number: st
 if __name__ == "__main__":
     import uvicorn
     
-    uvicorn.run("server:app", host="0.0.0.0", port=PORT, workers=4, limit_concurrency=50)
+    uvicorn.run("server:app", host="0.0.0.0", port=8000, workers=4, limit_concurrency=50)
